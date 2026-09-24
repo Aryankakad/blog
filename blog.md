@@ -68,7 +68,7 @@ $$F_{ij} = \left( \frac{V_{ij}}{K} \right)^{1/m}$$
 
 For representing pressure as a heatmap, the matrix is normalized to the range $[0, 1]$:
 
-$$H_{ij} = \operatorname{clip}\left( \frac{F_{ij} - F_{\min}}{F_{\max} - F_{\min}}, \; 0, \; 1 \right)$$
+$$H_{ij} = \mathrm{clip}\left( \frac{F_{ij} - F_{\min}}{F_{\max} - F_{\min}}, \; 0, \; 1 \right)$$
 
 where $H_{ij}$ is the normalized heatmap value, and $F_{\min}/F_{\max}$ are the minimum and maximum expected force values.
 
@@ -84,7 +84,7 @@ $$\mathrm{RGB}_{ij} = \mathcal{C}(H_{ij})$$
 
 To use tactile data for robot learning, the robot combines it with visual and joint-position information. Since ACT cannot directly process the 2D heatmap, a **Tactile Encoder** (CNN or MLP) converts it into a compact feature representation that ACT can use:
 
-$$T_{\text{tactile}} = \operatorname{Encoder}_{\text{tactile}}(H)$$
+$$T_{\text{tactile}} = \mathrm{Encoder}_{\text{tactile}}(H)$$
 
 where $T_{\text{tactile}}$ are the tactile tokens that represent the extracted tactile information.
 

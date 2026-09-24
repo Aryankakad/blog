@@ -22,7 +22,6 @@
       processEscapes: true,
       processEnvironments: true
     },
-    chtml: { font: 'Gyre-Pagella' },
     options: {
       skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
     }
@@ -278,7 +277,7 @@
 
 <p>For representing pressure as a heatmap, the matrix is normalized to the range $[0, 1]$:</p>
 
-<div class="eq">$$H_{ij} = \operatorname{clip}\left( \frac{F_{ij} - F_{\min}}{F_{\max} - F_{\min}}, \; 0, \; 1 \right)$$</div>
+<div class="eq">$$H_{ij} = \mathrm{clip}\left( \frac{F_{ij} - F_{\min}}{F_{\max} - F_{\min}}, \; 0, \; 1 \right)$$</div>
 
 <p>where $H_{ij}$ is the normalized heatmap value, and $F_{\min}/F_{\max}$ are the minimum and maximum expected force values.</p>
 
@@ -300,7 +299,7 @@
 
 <p>To use tactile data for robot learning, the robot combines it with visual and joint-position information. Since ACT cannot directly process the 2D heatmap, a <strong>Tactile Encoder</strong> (CNN or MLP) converts it into a compact feature representation that ACT can use:</p>
 
-<div class="eq">$$T_{\text{tactile}} = \operatorname{Encoder}_{\text{tactile}}(H)$$</div>
+<div class="eq">$$T_{\text{tactile}} = \mathrm{Encoder}_{\text{tactile}}(H)$$</div>
 
 <p>where $T_{\text{tactile}}$ are the tactile tokens that represent the extracted tactile information.</p>
 
