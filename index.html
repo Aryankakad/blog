@@ -286,6 +286,14 @@
 
 <div class="eq">$$\mathrm{RGB}_{ij} = \mathcal{C}(H_{ij})$$</div>
 
+<figure>
+  <div class="placeholder">
+    <span>IMAGE / GIF</span>
+    <span class="path">assets/heatmap-gradient.png</span>
+  </div>
+  <figcaption><b>Heatmap visualization.</b> Add caption showing the raw 12&times;32 array and the resulting pressure-gradient heatmap.</figcaption>
+</figure>
+
 <h2>Integrating Tactile Sensing into Manipulation Policies</h2>
 
 <h3>ACT</h3>
@@ -387,6 +395,14 @@
 <div class="eq">$$\hat{\epsilon} = \epsilon_\theta(x_t, t, C)$$</div>
 
 <p>Thus, the tactile tokens are not used as a separate input to the final action prediction — they are embedded into the conditioning of the action-generation network, allowing contact information from the tactile sensor to influence the actions predicted alongside vision and robot state.</p>
+
+<figure>
+  <div class="placeholder">
+    <span>IMAGE</span>
+    <span class="path">assets/diffusion-tactile-policy.png</span>
+  </div>
+  <figcaption><b>Diffusion Policy with tactile conditioning.</b> Add caption describing the denoising loop and how tactile tokens condition the action-generation network.</figcaption>
+</figure>
 
 <h2>Vision vs. Visuo-tactile Policy Evaluation</h2>
 
