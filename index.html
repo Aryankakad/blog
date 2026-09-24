@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beyond Vision: Giving Robots a Sense of Touch</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[
+    {left:'$$', right:'$$', display:true},
+    {left:'$', right:'$', display:false}
+  ], throwOnError:false});"></script>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --text:#d8dce3; --muted:#8b93a1;
+    --accent:#6ea8fe; --accent2:#b48efc; --border:#262b35; --code:#0b0d11;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:17px/1.75 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  }
+  main{max-width:780px; margin:0 auto; padding:64px 24px 120px}
+  header{padding-bottom:8px; border-bottom:1px solid var(--border); margin-bottom:40px}
+  h1{font-size:2.15rem; line-height:1.25; margin:0 0 6px; letter-spacing:-.5px}
+  .sub{color:var(--muted); font-size:.95rem}
+  h2{
+    font-size:1.5rem; margin:48px 0 14px; padding-bottom:6px;
+    border-bottom:1px solid var(--border); letter-spacing:-.3px;
+  }
+  h3{font-size:1.15rem; margin:30px 0 10px}
+  p{margin:14px 0}
+  strong{color:#fff}
+  a{color:var(--accent)}
+  .eq{
+    margin:18px 0; padding:18px 22px; background:var(--panel);
+    border:1px solid var(--border); border-radius:10px; text-align:center;
+    overflow-x:auto; font-size:1.08rem;
+  }
+  .eq .katex-display{margin:0}
+  code{
+    background:var(--code); border:1px solid var(--border); border-radius:5px;
+    padding:1px 6px; font-size:.9em;
+  }
+  aside{
+    margin:22px 0; padding:14px 18px; border:1px dashed var(--accent2);
+    border-radius:10px; color:var(--muted); font-size:.9rem;
+  }
+  figure{
+    margin:24px 0; text-align:center;
+  }
+  figure figcaption{color:var(--muted); font-size:.85rem; margin-top:8px}
+  ul,ol{padding-left:26px}
+  li{margin:6px 0}
+  hr{border:none; border-top:1px solid var(--border); margin:40px 0}
+
+  .katex{font-size:1.05em}
+  .katex-display>.katex>.katex-html>.katex-linebreak{min-width:0}
+
+  @media (max-width:520px){
+    main{padding:40px 16px 80px}
+    h1{font-size:1.7rem}
+    h2{font-size:1.3rem}
+  }
+  @media (prefers-color-scheme:light){
+    :root{
+      --bg:#ffffff; --panel:#f6f7f9; --text:#24292f; --muted:#6b7280;
+      --accent:#0969da; --accent2:#8250df; --border:#d8dee4; --code:#f2f3f5;
+    }
+    strong{color:#1f2328}
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>Beyond Vision: Giving Robots a Sense of Touch</h1>
+  <div class="sub">Mission Mimosa &middot; Visuo-tactile manipulation with FlexiTac</div>
+</header>
+
+<h2>Introduction</h2>
+
+<p>Most robotic manipulation systems today rely almost entirely on vision and kinematics. While this works for rigid tasks, closed-loop control hits a wall when a robot actually needs to grasp, slip, or adjust to an object dynamically. Without tactile feedback, the system is essentially numb.</p>
+
+<p><strong>Mission Mimosa</strong> bridges this gap by building a robust framework for visuo-tactile manipulation.</p>
+
+<p>Through this project, we are integrating custom high-resolution tactile sensors — specifically the <strong>FlexiTac arrays</strong> — directly into robotic end-effectors. Rather than relying on vision alone, we capture continuous pressure data across a 512-taxel grid during teleoperation. This tactile data is synchronized with RGB camera feeds and processed through convolutional encoders to extract dense spatial pressure features.</p>
+
+<p>To make the robot truly contact-aware, we fuse these distinct visual and tactile signals using <strong>bidirectional cross-attention mechanisms</strong>. The camera tells the touch signal what the robot is holding, and the touch signal tells the camera exactly where and how hard the contact is.</p>
+
+<p>This unified visuo-tactile data then serves as the conditioning input for advanced action generation architectures, including <strong>Diffusion</strong>, <strong>ACT</strong>, and <strong>SmolVLA</strong>.</p>
+
+<h2>FlexiTac: Sensing Through Flexible Circuits</h2>
+
+<p>FlexiTac is a low-cost, three-layer (FPC–Velostat–FPC) tactile sensor based on the principle of <strong>piezoresistance</strong>. It consists of a readout board made of simple electronic components communicating with the host PC at 100&nbsp;Hz.</p>
+
+<p>It consists of two FPCs with vertical and horizontal alignment of electrodes each. Velostat — a piezoresistive material — is sandwiched between these two FPCs, resulting in a 16&times;32 matrix whose elements are known as <strong>taxels</strong>. When pressure is applied to the sensor, the Velostat's resistance changes at the point of contact. Each of the 512 taxels is mapped to its (row, column) position in the matrix, so every taxel holds its own pressure value. However, the current FlexiTac supports a 12&times;32 matrix. Together, these values form a complete pressure image known as the <strong>heatmap</strong>.</p>
+
+<p>The heatmap converts the 12&times;32 tactile array of raw taxels into a 2D pressure image. Each taxel is displayed at its position in the tactile array, and the colour gradient shows how hard that particular region is pressed. The footprint of any object appears as a 2D image on the visualizer, so you can predict the shape and size of the grasped object. The mapping keeps updating in real time, letting you track changing contacts live.</p>
+
+<figure>
+  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">IMAGE / GIF placeholder — FlexiTac sensor &amp; live heatmap visualizer</div>
+  <figcaption>FlexiTac sensor with live heatmap visualizer</figcaption>
+</figure>
+
+<h3>Mechanical Response</h3>
+
+<p>When the sensor is pressed, the applied force is distributed across individual taxels. For a taxel at row $i$ and column $j$, the resulting pressure depends on how much force is applied and the area over which it acts:</p>
+
+<div class="eq">$$P_{ij} = \frac{F_{ij}}{A_{ij}}$$</div>
+
+<p>where $P_{ij}$ is the resulting pressure, $F_{ij}$ is the applied normal force, and $A_{ij}$ is the effective contact area of the taxel.</p>
+
+<p>This pressure changes the microscopic contact between the conductive material and the electrode. For an ideal contact, the conductance scales linearly:</p>
+
+<div class="eq">$$C_x = k_x \cdot P_x$$</div>
+
+<p>where $C_x$ is the contact conductance, $P_x$ the applied pressure, and $k_x$ the contact sensitivity constant. As pressure increases, conductance increases and resistance decreases, since $R = 1/C$.</p>
+
+<p>However, for real FlexiTac-like sensors, contact mechanics result in a nonlinear, sublinear response:</p>
+
+<div class="eq">$$C_x = k_x \cdot \left(P_x\right)^m$$</div>
+
+<p>where $m$ is the nonlinearity exponent. For real sensors, $m &lt; 1$ at lower loads, causing the response to curve rather than remain perfectly linear.</p>
+
+<h3>Electrical Readout</h3>
+
+<p>The total electrical resistance of a single taxel is modeled as multiple paths working together:</p>
+
+<div class="eq">$$R_{\text{taxel}} = R_{\text{in}} + R_{\text{out}} + R_{\text{gap}}$$</div>
+
+<p>where $R_{\text{gap}}$ is the internal resistance of the conductive piezoresistive material bridging the gap between the electrodes.</p>
+
+<p>This physical resistance is read by an external circuit and converted into a readable voltage:</p>
+
+<div class="eq">$$V_{\text{out}} = \frac{R_{\text{gain}}}{R_{\text{taxel}}} \cdot V_{\text{bias}}$$</div>
+
+<p>For a full 12&times;32 FlexiTac array, a microcontroller's ADC digitizes this output for every taxel:</p>
+
+<div class="eq">$$V_{ij} = \frac{D_{ij}}{D_{\max}} \cdot V_{\text{ref}}$$</div>
+
+<p>where $D_{ij}$ is the raw ADC reading, $D_{\max}$ the ADC's maximum digital value, and $V_{\text{ref}}$ the reference voltage used to convert the reading into an actual voltage.</p>
+
+<p>This electrical reading is then converted into an estimated force using:</p>
+
+<div class="eq">$$F_{ij} = \left( \frac{V_{ij}}{K} \right)^{1/m}$$</div>
+
+<h3>Tactile Data Representation</h3>
+
+<p>For representing pressure as a heatmap, the matrix is normalized to the range $[0, 1]$:</p>
+
+<div class="eq">$$H_{ij} = \operatorname{clip}\left( \frac{F_{ij} - F_{\min}}{F_{\max} - F_{\min}}, \; 0, \; 1 \right)$$</div>
+
+<p>where $H_{ij}$ is the normalized heatmap value, and $F_{\min}/F_{\max}$ are the minimum and maximum expected force values.</p>
+
+<p>These normalized values are then mapped to colour by a colormap to create the heatmap gradient:</p>
+
+<div class="eq">$$\mathrm{RGB}_{ij} = \mathcal{C}(H_{ij})$$</div>
+
+<h2>Integrating Tactile Sensing into Manipulation Policies</h2>
+
+<h3>ACT</h3>
+
+<p>To use tactile data for robot learning, the robot combines it with visual and joint-position information. Since ACT cannot directly process the 2D heatmap, a <strong>Tactile Encoder</strong> (CNN or MLP) converts it into a compact feature representation that ACT can use:</p>
+
+<div class="eq">$$T_{\text{tactile}} = \operatorname{Encoder}_{\text{tactile}}(H)$$</div>
+
+<p>where $T_{\text{tactile}}$ are the tactile tokens that represent the extracted tactile information.</p>
+
+<p>Finally, the robot combines these tactile tokens with its other sensor data into a single flat sequence. This multimodal sequence is what gets fed into the Transformer policy to predict the robot's next movements:</p>
+
+<div class="eq">$$X_{\text{input}} = \left[ z,\; T_{\text{state}},\; T_{\text{tactile}_1 \dots N},\; T_{\text{img}_1 \dots M} \right]$$</div>
+
+<p>where $X_{\text{input}}$ is the combined multimodal sequence, $T_{\text{img}}$ the image feature token, $T_{\text{state}}$ the proprioceptive token, and $z$ the latent token representing variation during training.</p>
+
+<figure>
+  <div style="border:2px dashed var(--border); border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — ACT teleoperation / training with tactile overlays</div>
+  <figcaption>ACT data collection with tactile overlays</figcaption>
+</figure>
+
+<h3>SmolVLA</h3>
+
+<h4>Phase 1: Integrating the Senses</h4>
+
+<p>Before a robot can move, it must translate physical sensations into a mathematical language the Vision-Language Model (VLM) understands.</p>
+
+<p><strong>Tactile Encoding &amp; Projection.</strong> The 2D pressure heatmaps from the robot's fingers are flattened into sequence tokens, then linearly projected to match the network's exact hidden dimension size:</p>
+
+<div class="eq">$$Z_{\text{tactile}} = f_{\text{enc}}(T)$$</div>
+<div class="eq">$$E_{\text{tactile}} = Z_{\text{tactile}} W_{\text{proj}} + b_{\text{proj}}$$</div>
+
+<p>where $T$ is the raw tactile heatmap tensor, $f_{\text{enc}}$ the encoder (like a CNN) that turns the map into tokens, and $E_{\text{tactile}}$ the final embedded sequence, dimensionally aligned for the VLM.</p>
+
+<p><strong>Assembling the Multimodal Context.</strong> Touch is useless without context. The model concatenates the embeddings for vision, language instructions, touch, and the robot's joint states into a single "prefix" sequence:</p>
+
+<div class="eq">$$C = \left[ E_{\text{img}} \;\Vert\; E_{\text{lang}} \;\Vert\; E_{\text{tactile}} \;\Vert\; E_{\text{state}} \right]$$</div>
+
+<p>where $C$ is the unified context tensor. By packing them together, the network's self-attention mechanism can cross-reference what it feels with what it sees.</p>
+
+<h4>Phase 2: Learning the Flow (Training)</h4>
+
+<p>To teach the robot to move, SmolVLA uses <strong>Continuous Normalizing Flows</strong>. It artificially destroys perfect actions with noise, then trains the network to predict the exact path (velocity) back to the clean action.</p>
+
+<p><strong>Forward Noise Interpolation.</strong> During training, the system mixes a perfect ground-truth action with pure noise at a random timestep:</p>
+
+<div class="eq">$$x_t = t\,\epsilon + (1 - t)\,a$$</div>
+
+<p>where $a$ is the true robot action, $\epsilon$ pure standard Gaussian noise, and $x_t$ the artificially noisy action at timestep $t$.</p>
+
+<p><strong>Velocity Prediction (the loss function).</strong> The model aims to predict the velocity vector $u_t$ needed to transport the clean action into noise. We train the network by measuring how far its prediction is from the truth using Mean Squared Error:</p>
+
+<div class="eq">$$\mathcal{L}(\theta) = \mathbb{E}_{t,\epsilon,a}\left[ \left\| v_\theta(x_t, t, C) - u_t \right\|_2^2 \right]$$</div>
+
+<p>where $v_\theta$ is the neural network trying to predict the flow, $u_t$ the true target velocity, and $C$ the multimodal context from Phase 1, acting as the guiding condition.</p>
+
+<h4>Phase 3: Deployment (Inference)</h4>
+
+<p>In the real world, the robot doesn't know the perfect action. It must derive the correct movement from scratch based on its current environment.</p>
+
+<p><strong>Action Generation.</strong> Starting with pure noise ($t = 1$), the model uses an Euler ODE solver to step backward along the vector field it learned, guided by the context $C$, until it arrives at a clean movement:</p>
+
+<div class="eq">$$x_{t - \Delta t} = x_t - \Delta t \cdot v_\theta(x_t, t, C)$$</div>
+
+<p>where $x_t$ is the noisy state at the current timestep, $\Delta t$ the step size for the ODE solver, and $x_{t-\Delta t}$ the progressively refined action. Once this reaches $t = 0$, the robot executes the resulting physical command.</p>
+
+<figure>
+  <div style="border:2px dashed var(--border); border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — SmolVLA real-robot deployment</div>
+  <figcaption>SmolVLA real-robot deployment</figcaption>
+</figure>
+
+<h3>Diffusion Policy</h3>
+
+<p>To integrate touch, the tactile heatmap is first passed through a tactile encoder that converts the raw sensor readings into a compact set of feature tokens:</p>
+
+<div class="eq">$$T_{\text{tactile}} = E_{\text{tactile}}(H)$$</div>
+
+<p>where $H$ is the tactile heatmap and $T_{\text{tactile}}$ represents the extracted tactile information.</p>
+
+<p>These tactile features are then flattened and combined with the visual and robot-state features:</p>
+
+<div class="eq">$$C = \left[ E_{\text{vision}} \;\Vert\; E_{\text{state}} \;\Vert\; T_{\text{tactile}} \right]$$</div>
+
+<p>This combined representation acts as the policy's multimodal observation, containing information about what the robot sees, feels, and its current state. It is passed through conditioning layers to generate parameters that modulate the action-generation network, allowing the tactile information to influence its intermediate features.</p>
+
+<p>Instead of directly predicting the action trajectory, Diffusion Policy learns to <strong>denoise</strong> it. Noise is added to the original action $x_0$:</p>
+
+<div class="eq">$$x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\,\epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)$$</div>
+
+<p>The policy then predicts the added noise using the noisy action, the diffusion timestep, and the multimodal conditioning:</p>
+
+<div class="eq">$$\hat{\epsilon} = \epsilon_\theta(x_t, t, C)$$</div>
+
+<p>Thus, the tactile tokens are not used as a separate input to the final action prediction — they are embedded into the conditioning of the action-generation network, allowing contact information from the tactile sensor to influence the actions predicted alongside vision and robot state.</p>
+
+<h2>Vision vs. Visuo-tactile Policy Evaluation</h2>
+
+<p>Here's the contact-rich benchmark task used to compare vision-only and visuo-tactile policies.</p>
+
+<figure>
+  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">IMAGE placeholder — benchmark task setup</div>
+  <figcaption>Contact-rich benchmark task</figcaption>
+</figure>
+
+<figure>
+  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — vision-only vs. visuo-tactile rollout comparison</div>
+  <figcaption>Vision-only vs. visuo-tactile rollout comparison</figcaption>
+</figure>
+
+</main>
+</body>
+</html>
