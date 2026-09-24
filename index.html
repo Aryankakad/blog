@@ -1,85 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="theme-color" content="#ffffff">
 <title>Beyond Vision: Giving Robots a Sense of Touch</title>
+<meta name="author" content="Aryankakad">
+<meta name="description" content="Mission Mimosa — visuo-tactile robotic manipulation with FlexiTac sensors, ACT, SmolVLA and Diffusion policies.">
+
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body, {delimiters:[
-    {left:'$$', right:'$$', display:true},
-    {left:'$', right:'$', display:false}
-  ], throwOnError:false});"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    chtml: { font: 'Gyre-Pagella' },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 <style>
   :root{
-    --bg:#0f1115; --panel:#171a21; --text:#d8dce3; --muted:#8b93a1;
-    --accent:#6ea8fe; --accent2:#b48efc; --border:#262b35; --code:#0b0d11;
+    --theme:#ffffff;
+    --entry:#ffffff;
+    --primary:#212121;
+    --secondary:#5c5c5c;
+    --tertiary:#f9f9f9;
+    --content:#212121;
+    --code-bg:#f5f6f8;
+    --border:#eeeeee;
+    --figure-bg:#f5f6f8;
+    --accent:#5b7cf7;
+  }
+  body.dark{
+    --theme:rgb(29,30,32);
+    --entry:rgb(46,46,51);
+    --primary:rgb(218,218,219);
+    --secondary:rgb(155,156,157);
+    --tertiary:rgb(65,66,68);
+    --content:rgb(196,196,197);
+    --code-bg:rgb(55,56,62);
+    --border:rgb(51,51,51);
+    --figure-bg:rgb(46,46,51);
+    --accent:#8fa8ff;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    margin:0; background:var(--bg); color:var(--text);
-    font:17px/1.75 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    margin:0; background:var(--theme); color:var(--primary);
+    font-family:Charter,"Bitstream Charter",Cambria,Georgia,serif;
+    font-size:18px; line-height:1.8;
+    transition:background .2s ease-in-out,color .2s ease-in-out;
   }
-  main{max-width:780px; margin:0 auto; padding:64px 24px 120px}
-  header{padding-bottom:8px; border-bottom:1px solid var(--border); margin-bottom:40px}
-  h1{font-size:2.15rem; line-height:1.25; margin:0 0 6px; letter-spacing:-.5px}
-  .sub{color:var(--muted); font-size:.95rem}
+
+  /* Header */
+  header.header{
+    position:sticky; top:0; background:var(--theme); border-bottom:1px solid var(--border);
+    z-index:10;
+  }
+  .nav{
+    max-width:720px; margin:0 auto; padding:14px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:Poppins,system-ui,sans-serif; font-weight:600; font-size:1.05rem;
+    text-decoration:none; color:var(--primary); letter-spacing:.2px;
+  }
+  .logo a{color:var(--primary); text-decoration:none}
+  #theme-toggle{
+    background:none; border:none; cursor:pointer; color:var(--primary);
+    padding:6px; border-radius:6px; display:flex; align-items:center;
+  }
+  #theme-toggle:hover{background:var(--tertiary)}
+  #theme-toggle svg{width:20px; height:20px}
+  body:not(.dark) #theme-toggle .moon{display:block}
+  body:not(.dark) #theme-toggle .sun{display:none}
+  body.dark #theme-toggle .moon{display:none}
+  body.dark #theme-toggle .sun{display:block}
+
+  /* Layout */
+  main{max-width:720px; margin:0 auto; padding:48px 24px 80px}
+  @media (max-width:520px){ main{padding:32px 16px 60px} }
+
+  /* Post header */
+  header.post-header{padding-bottom:20px; border-bottom:1px solid var(--border); margin-bottom:36px}
+  h1{
+    font-family:Poppins,system-ui,sans-serif;
+    font-size:2.2rem; line-height:1.25; margin:0 0 10px; font-weight:700;
+    letter-spacing:-.4px;
+  }
+  .post-meta{color:var(--secondary); font-size:.9rem; font-family:Poppins,sans-serif; font-weight:400}
+
+  /* Headings */
   h2{
-    font-size:1.5rem; margin:48px 0 14px; padding-bottom:6px;
-    border-bottom:1px solid var(--border); letter-spacing:-.3px;
+    font-family:Poppins,system-ui,sans-serif; font-size:1.55rem; font-weight:600;
+    color:var(--primary); margin:48px 0 6px; padding-bottom:6px; letter-spacing:-.3px;
   }
-  h3{font-size:1.15rem; margin:30px 0 10px}
+  h3{
+    font-family:Poppins,system-ui,sans-serif; font-size:1.2rem; font-weight:600;
+    color:var(--primary); margin:34px 0 2px;
+  }
+  h4{
+    font-family:Poppins,system-ui,sans-serif; font-size:1.02rem; font-weight:600;
+    color:var(--primary); margin:28px 0 0; text-transform:uppercase; letter-spacing:.6px;
+  }
+  h4::before{content:"▸ "; color:var(--accent)}
+
+  /* Body text */
   p{margin:14px 0}
-  strong{color:#fff}
-  a{color:var(--accent)}
-  .eq{
-    margin:18px 0; padding:18px 22px; background:var(--panel);
-    border:1px solid var(--border); border-radius:10px; text-align:center;
-    overflow-x:auto; font-size:1.08rem;
-  }
-  .eq .katex-display{margin:0}
+  strong{color:var(--primary); font-weight:700}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  em{color:var(--primary)}
+
+  /* Inline code */
   code{
-    background:var(--code); border:1px solid var(--border); border-radius:5px;
-    padding:1px 6px; font-size:.9em;
+    font-family:"Fira Code",ui-monospace,SFMono-Regular,monospace; font-size:.85em;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:4px;
+    padding:1px 5px;
   }
-  aside{
-    margin:22px 0; padding:14px 18px; border:1px dashed var(--accent2);
-    border-radius:10px; color:var(--muted); font-size:.9rem;
+
+  /* Display equations — Clarity-style gray container */
+  div.eq{
+    margin:22px 0; padding:18px 24px; background:var(--figure-bg);
+    border:1px solid var(--border); border-radius:8px; text-align:center;
+    overflow-x:auto; font-size:1.05rem; color:var(--primary);
   }
+  div.eq .MJXc-display{margin:0}
+  mjx-container[display="true"]{margin:0 !important}
+
+  /* Figures — Clarity-style gray container with caption */
   figure{
-    margin:24px 0; text-align:center;
+    margin:28px 0; padding:22px; background:var(--figure-bg);
+    border:1px solid var(--border); border-radius:8px; text-align:center;
   }
-  figure figcaption{color:var(--muted); font-size:.85rem; margin-top:8px}
-  ul,ol{padding-left:26px}
-  li{margin:6px 0}
-  hr{border:none; border-top:1px solid var(--border); margin:40px 0}
+  figure img, figure video{width:100%; max-width:100%; border-radius:6px; display:block; margin:0 auto}
+  figcaption{
+    margin-top:14px; color:var(--secondary); font-size:.9rem; text-align:left;
+    line-height:1.6;
+  }
+  figure .placeholder{
+    border:2px dashed var(--secondary); border-radius:6px; min-height:240px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    color:var(--secondary); font-size:.85rem; font-family:Poppins,sans-serif;
+  }
+  figure .placeholder .path{font-family:"Fira Code",monospace; font-size:.8rem; margin-top:6px; opacity:.8}
 
-  .katex{font-size:1.05em}
-  .katex-display>.katex>.katex-html>.katex-linebreak{min-width:0}
+  /* Footer */
+  footer.footer{
+    border-top:1px solid var(--border); text-align:center;
+    color:var(--secondary); font-size:.85rem; padding:26px 16px 44px;
+    font-family:Poppins,sans-serif;
+  }
 
-  @media (max-width:520px){
-    main{padding:40px 16px 80px}
-    h1{font-size:1.7rem}
-    h2{font-size:1.3rem}
+  .top-link{
+    position:fixed; right:28px; bottom:28px; width:38px; height:38px;
+    background:var(--entry); border:1px solid var(--border); border-radius:8px;
+    display:flex; align-items:center; justify-content:center; color:var(--primary);
+    text-decoration:none; opacity:0; visibility:hidden; transition:.2s; z-index:5;
   }
-  @media (prefers-color-scheme:light){
-    :root{
-      --bg:#ffffff; --panel:#f6f7f9; --text:#24292f; --muted:#6b7280;
-      --accent:#0969da; --accent2:#8250df; --border:#d8dee4; --code:#f2f3f5;
-    }
-    strong{color:#1f2328}
-  }
+  .top-link.visible{opacity:1; visibility:visible}
+  .top-link:hover{text-decoration:none; background:var(--tertiary)}
 </style>
 </head>
-<body>
-<main>
 
-<header>
+<body id="top">
+<script>
+  if (localStorage.getItem("pref-theme") === "dark") {
+    document.body.classList.add('dark');
+  } else if (localStorage.getItem("pref-theme") === "light") {
+    document.body.classList.remove('dark')
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('dark');
+  }
+</script>
+
+<header class="header">
+  <nav class="nav">
+    <div class="logo"><a href="#top">Mission Mimosa</a></div>
+    <button id="theme-toggle" title="Toggle light/dark mode">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    </button>
+  </nav>
+</header>
+
+<main class="main">
+
+<header class="post-header">
   <h1>Beyond Vision: Giving Robots a Sense of Touch</h1>
-  <div class="sub">Mission Mimosa &middot; Visuo-tactile manipulation with FlexiTac</div>
+  <p class="post-meta">Mission Mimosa &middot; Visuo-tactile manipulation with FlexiTac &middot; by Aryankakad</p>
 </header>
 
 <h2>Introduction</h2>
@@ -103,8 +225,11 @@
 <p>The heatmap converts the 12&times;32 tactile array of raw taxels into a 2D pressure image. Each taxel is displayed at its position in the tactile array, and the colour gradient shows how hard that particular region is pressed. The footprint of any object appears as a 2D image on the visualizer, so you can predict the shape and size of the grasped object. The mapping keeps updating in real time, letting you track changing contacts live.</p>
 
 <figure>
-  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">IMAGE / GIF placeholder — FlexiTac sensor &amp; live heatmap visualizer</div>
-  <figcaption>FlexiTac sensor with live heatmap visualizer</figcaption>
+  <div class="placeholder">
+    <span>IMAGE / GIF</span>
+    <span class="path">assets/flexitac-sensor.gif</span>
+  </div>
+  <figcaption><b>FlexiTac sensor.</b> Add caption describing the sensor and the live heatmap visualizer.</figcaption>
 </figure>
 
 <h3>Mechanical Response</h3>
@@ -178,8 +303,11 @@
 <p>where $X_{\text{input}}$ is the combined multimodal sequence, $T_{\text{img}}$ the image feature token, $T_{\text{state}}$ the proprioceptive token, and $z$ the latent token representing variation during training.</p>
 
 <figure>
-  <div style="border:2px dashed var(--border); border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — ACT teleoperation / training with tactile overlays</div>
-  <figcaption>ACT data collection with tactile overlays</figcaption>
+  <div class="placeholder">
+    <span>GIF</span>
+    <span class="path">assets/act-teleop.gif</span>
+  </div>
+  <figcaption><b>ACT data collection.</b> Add caption describing teleoperation with tactile overlays.</figcaption>
 </figure>
 
 <h3>SmolVLA</h3>
@@ -191,6 +319,7 @@
 <p><strong>Tactile Encoding &amp; Projection.</strong> The 2D pressure heatmaps from the robot's fingers are flattened into sequence tokens, then linearly projected to match the network's exact hidden dimension size:</p>
 
 <div class="eq">$$Z_{\text{tactile}} = f_{\text{enc}}(T)$$</div>
+
 <div class="eq">$$E_{\text{tactile}} = Z_{\text{tactile}} W_{\text{proj}} + b_{\text{proj}}$$</div>
 
 <p>where $T$ is the raw tactile heatmap tensor, $f_{\text{enc}}$ the encoder (like a CNN) that turns the map into tokens, and $E_{\text{tactile}}$ the final embedded sequence, dimensionally aligned for the VLM.</p>
@@ -228,8 +357,11 @@
 <p>where $x_t$ is the noisy state at the current timestep, $\Delta t$ the step size for the ODE solver, and $x_{t-\Delta t}$ the progressively refined action. Once this reaches $t = 0$, the robot executes the resulting physical command.</p>
 
 <figure>
-  <div style="border:2px dashed var(--border); border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — SmolVLA real-robot deployment</div>
-  <figcaption>SmolVLA real-robot deployment</figcaption>
+  <div class="placeholder">
+    <span>GIF</span>
+    <span class="path">assets/smolvla-deploy.gif</span>
+  </div>
+  <figcaption><b>SmolVLA deployment.</b> Add caption describing the real-robot rollout.</figcaption>
 </figure>
 
 <h3>Diffusion Policy</h3>
@@ -261,15 +393,48 @@
 <p>Here's the contact-rich benchmark task used to compare vision-only and visuo-tactile policies.</p>
 
 <figure>
-  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">IMAGE placeholder — benchmark task setup</div>
-  <figcaption>Contact-rich benchmark task</figcaption>
+  <div class="placeholder">
+    <span>IMAGE</span>
+    <span class="path">assets/benchmark-task.png</span>
+  </div>
+  <figcaption><b>Benchmark task.</b> Add caption describing the contact-rich evaluation setup.</figcaption>
 </figure>
 
 <figure>
-  <div style="border:2px dashed var(--border); border-radius:12px; height:260px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem">GIF placeholder — vision-only vs. visuo-tactile rollout comparison</div>
-  <figcaption>Vision-only vs. visuo-tactile rollout comparison</figcaption>
+  <div class="placeholder">
+    <span>GIF</span>
+    <span class="path">assets/vs-comparison.gif</span>
+  </div>
+  <figcaption><b>Vision-only vs. visuo-tactile.</b> Add caption comparing the two policy rollouts.</figcaption>
 </figure>
 
 </main>
+
+<footer class="footer">
+  &copy; 2026 Mission Mimosa &middot; Powered by Git Pages
+</footer>
+
+<a class="top-link" id="top-link" href="#top" title="Back to top" accesskey="g">
+  <svg viewBox="0 0 12 6" width="14" height="8" fill="currentColor"><path d="M12 6H0l6-6z"/></svg>
+</a>
+
+<script>
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    if (document.body.classList.contains("dark")) {
+      document.body.classList.remove('dark');
+      localStorage.setItem("pref-theme", 'light');
+    } else {
+      document.body.classList.add('dark');
+      localStorage.setItem("pref-theme", 'dark');
+    }
+  });
+
+  const topLink = document.getElementById("top-link");
+  window.addEventListener("scroll", () => {
+    const visible = window.scrollY > 600;
+    topLink.classList.toggle("visible", visible);
+  });
+</script>
+
 </body>
 </html>
