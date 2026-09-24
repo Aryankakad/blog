@@ -40,7 +40,7 @@ However, for real FlexiTac-like sensors, contact mechanics result in a nonlinear
 
 $$C_x = k_x \cdot \left(P_x\right)^m$$
 
-where $m$ is the nonlinearity exponent. For real sensors, $m < 1$ at lower loads, causing the response to curve rather than remain perfectly linear.
+where $m$ is the nonlinearity exponent. For real sensors, $m \lt 1$ at lower loads, causing the response to curve rather than remain perfectly linear.
 
 ### Electrical Readout
 
@@ -90,7 +90,7 @@ where $T_{\text{tactile}}$ are the tactile tokens that represent the extracted t
 
 Finally, the robot combines these tactile tokens with its other sensor data into a single flat sequence. This multimodal sequence is what gets fed into the Transformer policy to predict the robot's next movements:
 
-$$X_{\text{input}} = \left[ z,\; T_{\text{state}},\; T_{\text{tactile}_1 \dots N},\; T_{\text{img}_1 \dots M} \right]$$
+$$X_{\text{input}} = \left[ z,\; T_{\text{state}},\; T_{\text{tactile}}^{1 \dots N},\; T_{\text{img}}^{1 \dots M} \right]$$
 
 where $X_{\text{input}}$ is the combined multimodal sequence, $T_{\text{img}}$ the image feature token, $T_{\text{state}}$ the proprioceptive token, and $z$ the latent token representing variation during training.
 
