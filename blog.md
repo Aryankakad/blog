@@ -183,6 +183,6 @@ Here's the contact-rich benchmark task used to compare vision-only and visuo-tac
 - Shukor, M., Aubakirova, D., & Capuano, F. (2025). *SmolVLA*. [arXiv:2506.01844](https://arxiv.org/abs/2506.01844)
 - Chi, C., Xu, Z., Feng, S., Cousineau, E., Du, Y., Burchfiel, B., Tedrake, R., & Song, S. (2024). *Diffusion Policy: Visuomotor Policy Learning via Action Diffusion*. [arXiv:2303.04137](https://arxiv.org/abs/2303.04137)
 - Huang, B., & Li, Y. (2026). [arXiv:2604.28156](https://arxiv.org/abs/2604.28156)
-- FlexiTac: *Integration of tactile sensors*. [LeFlexiTac](https://tna001-ai.github.io/LeFlexiTac/index.html)
+- LeFlexiTac: *Integration of tactile sensors*. [LeFlexiTac](https://tna001-ai.github.io/LeFlexiTac/index.html)
 - Castellanos-Ramos, J., Navas-González, R., Fernández, I., & Vidal-Verdú, F. (2015). *Insights into the Mechanical Behaviour of a Layered Flexible Tactile Sensor*. Sensors, 15(10), 25433–25462. [doi:10.3390/s151025433](https://www.mdpi.com/1424-8220/15/10/25433)
 - Project website: [Mission Mimosa](https://zademahi238.github.io/mission-mimosa/)
