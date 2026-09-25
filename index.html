@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="theme-color" content="#ffffff">
 <title>Beyond Vision: Giving Robots a Sense of Touch</title>
-<meta name="author" content="Aryankakad">
+<meta name="author" content="Aryan Kakad, Mahi Zade">
 <meta name="description" content="Mission Mimosa — visuo-tactile robotic manipulation with FlexiTac sensors, ACT, SmolVLA and Diffusion policies.">
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -150,6 +150,16 @@
     margin-top:14px; color:var(--secondary); font-size:.9rem; text-align:left;
     line-height:1.6;
   }
+  ol.refs{
+    margin:10px 0 0; padding-left:0; list-style:none; counter-reset:refs;
+    font-size:.92rem; color:var(--secondary); line-height:1.7;
+  }
+  ol.refs li{ counter-increment:refs; margin:8px 0; padding-left:2.1rem; position:relative }
+  ol.refs li::before{
+    content:counter(refs) ". "; position:absolute; left:0;
+    color:var(--accent); font-family:Poppins,sans-serif; font-weight:600;
+  }
+  ol.refs em{ color:var(--primary) }
   figure .placeholder{
     border:2px dashed var(--secondary); border-radius:6px; min-height:240px;
     display:flex; align-items:center; justify-content:center; flex-direction:column;
@@ -200,7 +210,7 @@
 
 <header class="post-header">
   <h1>Beyond Vision: Giving Robots a Sense of Touch</h1>
-  <p class="post-meta">Mission Mimosa &middot; Visuo-tactile manipulation with FlexiTac &middot; by Aryankakad</p>
+  <p class="post-meta">Mission Mimosa &middot; Visuo-tactile manipulation with FlexiTac &middot; by Aryan Kakad &amp; Mahi Zade</p>
 </header>
 
 <h2>Introduction</h2>
@@ -224,11 +234,8 @@
 <p>The heatmap converts the 12&times;32 tactile array of raw taxels into a 2D pressure image. Each taxel is displayed at its position in the tactile array, and the colour gradient shows how hard that particular region is pressed. The footprint of any object appears as a 2D image on the visualizer, so you can predict the shape and size of the grasped object. The mapping keeps updating in real time, letting you track changing contacts live.</p>
 
 <figure>
-  <div class="placeholder">
-    <span>IMAGE / GIF</span>
-    <span class="path">assets/flexitac-sensor.gif</span>
-  </div>
-  <figcaption><b>FlexiTac sensor.</b> Add caption describing the sensor and the live heatmap visualizer.</figcaption>
+  <img src="assets/Flexitac_testing.png" alt="FlexiTac sensor with live heatmap visualizer">
+  <figcaption><b>FlexiTac sensor.</b> The 12&times;32 taxel array under test, with the live heatmap visualizer showing real-time pressure data as objects are grasped.</figcaption>
 </figure>
 
 <h3>Mechanical Response</h3>
@@ -285,14 +292,6 @@
 
 <div class="eq">$$\mathrm{RGB}_{ij} = \mathcal{C}(H_{ij})$$</div>
 
-<figure>
-  <div class="placeholder">
-    <span>IMAGE / GIF</span>
-    <span class="path">assets/heatmap-gradient.png</span>
-  </div>
-  <figcaption><b>Heatmap visualization.</b> Add caption showing the raw 12&times;32 array and the resulting pressure-gradient heatmap.</figcaption>
-</figure>
-
 <h2>Integrating Tactile Sensing into Manipulation Policies</h2>
 
 <h3>ACT</h3>
@@ -310,11 +309,8 @@
 <p>where $X_{\text{input}}$ is the combined multimodal sequence, $T_{\text{img}}$ the image feature token, $T_{\text{state}}$ the proprioceptive token, and $z$ the latent token representing variation during training.</p>
 
 <figure>
-  <div class="placeholder">
-    <span>GIF</span>
-    <span class="path">assets/act-teleop.gif</span>
-  </div>
-  <figcaption><b>ACT data collection.</b> Add caption describing teleoperation with tactile overlays.</figcaption>
+  <img src="assets/ACT_tactile_integration.png" alt="Tactile integration in ACT">
+  <figcaption><b>ACT with tactile conditioning.</b> Heatmaps are encoded into tactile tokens that join the proprioceptive and visual tokens in the multimodal sequence fed to the Transformer policy.</figcaption>
 </figure>
 
 <h3>SmolVLA</h3>
@@ -364,11 +360,8 @@
 <p>where $x_t$ is the noisy state at the current timestep, $\Delta t$ the step size for the ODE solver, and $x_{t-\Delta t}$ the progressively refined action. Once this reaches $t = 0$, the robot executes the resulting physical command.</p>
 
 <figure>
-  <div class="placeholder">
-    <span>GIF</span>
-    <span class="path">assets/smolvla-deploy.gif</span>
-  </div>
-  <figcaption><b>SmolVLA deployment.</b> Add caption describing the real-robot rollout.</figcaption>
+  <img src="assets/Smolvla_tactile_integration.png" alt="Tactile integration in SmolVLA">
+  <figcaption><b>SmolVLA with tactile conditioning.</b> Contact embeddings (from heatmap tokens) join the vision, language, and joint-state embeddings in the multimodal context prefix.</figcaption>
 </figure>
 
 <h3>Diffusion Policy</h3>
@@ -396,11 +389,8 @@
 <p>Thus, the tactile tokens are not used as a separate input to the final action prediction — they are embedded into the conditioning of the action-generation network, allowing contact information from the tactile sensor to influence the actions predicted alongside vision and robot state.</p>
 
 <figure>
-  <div class="placeholder">
-    <span>IMAGE</span>
-    <span class="path">assets/diffusion-tactile-policy.png</span>
-  </div>
-  <figcaption><b>Diffusion Policy with tactile conditioning.</b> Add caption describing the denoising loop and how tactile tokens condition the action-generation network.</figcaption>
+  <img src="assets/DP_tactile_integration.png" alt="Tactile integration in Diffusion Policy">
+  <figcaption><b>Diffusion Policy with tactile conditioning.</b> Observed visual, state, and tactile features condition the denoising network that predicts the action trajectory.</figcaption>
 </figure>
 
 <h2>Vision vs. Visuo-tactile Policy Evaluation</h2>
@@ -408,20 +398,25 @@
 <p>Here's the contact-rich benchmark task used to compare vision-only and visuo-tactile policies.</p>
 
 <figure>
-  <div class="placeholder">
-    <span>IMAGE</span>
-    <span class="path">assets/benchmark-task.png</span>
-  </div>
-  <figcaption><b>Benchmark task.</b> Add caption describing the contact-rich evaluation setup.</figcaption>
+  <img src="assets/Vision_vs_Visuo-tactile.png" alt="Contact-rich benchmark task">
+  <figcaption><b>Benchmark task.</b> The contact-rich task used to compare vision-only and visuo-tactile policies.</figcaption>
 </figure>
 
 <figure>
-  <div class="placeholder">
-    <span>GIF</span>
-    <span class="path">assets/vs-comparison.gif</span>
-  </div>
-  <figcaption><b>Vision-only vs. visuo-tactile.</b> Add caption comparing the two policy rollouts.</figcaption>
+  <img src="assets/policy_rollouts_transposed.gif" alt="Vision-only vs visuo-tactile rollout comparison">
+  <figcaption><b>Vision-only vs. visuo-tactile.</b> Rollout comparison between the two policies on the benchmark task.</figcaption>
 </figure>
+
+<h2>References</h2>
+
+<ol class="refs">
+  <li>Zhao, T. Z., Kumar, V., Levine, S., &amp; Finn, C. (2023). <em>Action Chunking with Transformers</em>. <a href="https://arxiv.org/abs/2304.13705">arXiv:2304.13705</a></li>
+  <li>Shukor, M., Aubakirova, D., &amp; Capuano, F. (2025). <em>SmolVLA</em>. <a href="https://arxiv.org/abs/2506.01844">arXiv:2506.01844</a></li>
+  <li>Chi, C., Xu, Z., Feng, S., Cousineau, E., Du, Y., Burchfiel, B., Tedrake, R., &amp; Song, S. (2024). <em>Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</em>. <a href="https://arxiv.org/abs/2303.04137">arXiv:2303.04137</a></li>
+  <li>Huang, B., &amp; Li, Y. (2026). <a href="https://arxiv.org/abs/2604.28156">arXiv:2604.28156</a></li>
+  <li>FlexiTac: <em>Integration of tactile sensors</em>.</li>
+  <li>Project website: <em>Mission Mimosa</em>. <a href="https://zademahi238.github.io/mission-mimosa/">https://zademahi238.github.io/mission-mimosa/</a></li>
+</ol>
 
 </main>
 

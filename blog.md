@@ -1,5 +1,7 @@
 # Beyond Vision: Giving Robots a Sense of Touch
 
+*Mission Mimosa · Visuo-tactile manipulation with FlexiTac · by Aryan Kakad & Mahi Zade*
+
 ## Introduction
 
 Most robotic manipulation systems today rely almost entirely on vision and kinematics. While this works for rigid tasks, closed-loop control hits a wall when a robot actually needs to grasp, slip, or adjust to an object dynamically. Without tactile feedback, the system is essentially numb.
@@ -20,7 +22,7 @@ It consists of two FPCs with vertical and horizontal alignment of electrodes eac
 
 The heatmap converts the 12×32 tactile array of raw taxels into a 2D pressure image. Each taxel is displayed at its position in the tactile array, and the colour gradient shows how hard that particular region is pressed. The footprint of any object appears as a 2D image on the visualizer, so you can predict the shape and size of the grasped object. The mapping keeps updating in real time, letting you track changing contacts live.
 
-![FlexiTac sensor with live heatmap visualizer](assets/flexitac-sensor.gif)
+![FlexiTac sensor with live heatmap visualizer](assets/Flexitac_testing.png)
 
 ### Mechanical Response
 
@@ -76,8 +78,6 @@ These normalized values are then mapped to colour by a colormap to create the he
 
 $$\mathrm{RGB}_{ij} = \mathcal{C}(H_{ij})$$
 
-![Heatmap gradient visualization](assets/heatmap-gradient.png)
-
 ## Integrating Tactile Sensing into Manipulation Policies
 
 ### ACT
@@ -94,7 +94,7 @@ $$X_{\text{input}} = \left[ z,\; T_{\text{state}},\; T_{\text{tactile}}^{1 \dots
 
 where $X_{\text{input}}$ is the combined multimodal sequence, $T_{\text{img}}$ the image feature token, $T_{\text{state}}$ the proprioceptive token, and $z$ the latent token representing variation during training.
 
-![ACT teleoperation / training with tactile overlays](assets/act-teleop.gif)
+![ACT with tactile conditioning](assets/ACT_tactile_integration.png)
 
 ### SmolVLA
 
@@ -142,7 +142,7 @@ $$x_{t - \Delta t} = x_t - \Delta t \cdot v_\theta(x_t, t, C)$$
 
 where $x_t$ is the noisy state at the current timestep, $\Delta t$ the step size for the ODE solver, and $x_{t-\Delta t}$ the progressively refined action. Once this reaches $t = 0$, the robot executes the resulting physical command.
 
-![SmolVLA real-robot deployment](assets/smolvla-deploy.gif)
+![SmolVLA with tactile conditioning](assets/Smolvla_tactile_integration.png)
 
 ### Diffusion Policy
 
@@ -168,11 +168,20 @@ $$\hat{\epsilon} = \epsilon_\theta(x_t, t, C)$$
 
 Thus, the tactile tokens are not used as a separate input to the final action prediction — they are embedded into the conditioning of the action-generation network, allowing contact information from the tactile sensor to influence the actions predicted alongside vision and robot state.
 
-![Diffusion Policy with tactile conditioning](assets/diffusion-tactile-policy.png)
+![Diffusion Policy with tactile conditioning](assets/DP_tactile_integration.png)
 
 ## Vision vs. Visuo-tactile Policy Evaluation
 
 Here's the contact-rich benchmark task used to compare vision-only and visuo-tactile policies.
 
-![Benchmark task setup](assets/benchmark-task.png)
-![Vision-only vs. visuo-tactile rollout comparison](assets/vs-comparison.gif)
+![Contact-rich benchmark task](assets/Vision_vs_Visuo-tactile.png)
+![Vision-only vs. visuo-tactile rollout comparison](assets/policy_rollouts_transposed.gif)
+
+## References
+
+- Zhao, T. Z., Kumar, V., Levine, S., & Finn, C. (2023). *Action Chunking with Transformers*. [arXiv:2304.13705](https://arxiv.org/abs/2304.13705)
+- Shukor, M., Aubakirova, D., & Capuano, F. (2025). *SmolVLA*. [arXiv:2506.01844](https://arxiv.org/abs/2506.01844)
+- Chi, C., Xu, Z., Feng, S., Cousineau, E., Du, Y., Burchfiel, B., Tedrake, R., & Song, S. (2024). *Diffusion Policy: Visuomotor Policy Learning via Action Diffusion*. [arXiv:2303.04137](https://arxiv.org/abs/2303.04137)
+- Huang, B., & Li, Y. (2026). [arXiv:2604.28156](https://arxiv.org/abs/2604.28156)
+- FlexiTac: *Integration of tactile sensors*.
+- Project website: [Mission Mimosa](https://zademahi238.github.io/mission-mimosa/)
